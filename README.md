@@ -1,3 +1,10 @@
+## Status
+
+Em desenvolvimento.
+
+O projeto continuará sendo evoluído conforme novos conceitos e funcionalidades forem estudados e implementados.
+
+
 # HelpDesk API
 
 API REST de um sistema de Help Desk desenvolvida em **C# e ASP.NET Core**.
