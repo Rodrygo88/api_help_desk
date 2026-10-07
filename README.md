@@ -10,7 +10,7 @@ O projeto está sendo desenvolvido como forma de prática em desenvolvimento bac
 * .NET
 * ASP.NET Core
 * Entity Framework Core
-* PostgreSQL
+* PostgreSQL (Inicialmente com SQLite)
 * REST API
 
 ## Arquitetura e conceitos
