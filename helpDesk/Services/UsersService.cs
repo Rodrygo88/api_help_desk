@@ -14,9 +14,20 @@ namespace helpDesk.Services
             _repository = repository;
         }
 
-        public List<User> GetAll()
+        public List<UserDto> GetAll()
         {
-            return _repository.GetAll();
+            var users = _repository.GetAll();
+
+            var result = users.Select(user => new UserDto
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Email = user.Email,
+                Role = user.Role,
+                CreatedAt = user.CreatedAt
+            }).ToList();
+
+            return result;
         }
 
         public UserDto GetById(int id)
@@ -42,11 +53,13 @@ namespace helpDesk.Services
 
         public UserDto Create(CreateUserDto dto)
         {
+            var PasswordHash = dto.Password; //aplicar o hash dps
+
             var user = new User
             {
                 Name = dto.Name,
                 Email = dto.Email,
-                PasswordHash = dto.PasswordHash,
+                PasswordHash = PasswordHash,
                 Role = dto.Role
             };
 
@@ -66,11 +79,13 @@ namespace helpDesk.Services
 
         public UserDto Update(int id, UpdateUserDto dto)
         {
+            var PasswordHash = dto.Password; //aplicar o hash dps
+
             var userUpdate = new User
             {
                 Name = dto.Name,
                 Email = dto.Email,
-                PasswordHash = dto.PasswordHash,
+                PasswordHash = PasswordHash,
                 Role = dto.Role
             };
 

@@ -20,7 +20,12 @@ namespace helpDesk.Controllers
         {
             var tickets = _services.GetAll();
 
-            return Ok(tickets);
+            var response = new ResponseDto<List<TicketDto>>
+                {
+                    Data = tickets
+                };
+
+            return Ok(response);
         }
 
 
@@ -39,14 +44,25 @@ namespace helpDesk.Controllers
                 return Ok(response);
             }
 
+
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(
+                    new ResponseDto
+                    {
+                        Errors = [ex.Message]
+                    }
+                );
             }
 
             catch (Exception)
             {
-                return StatusCode(500, "Erro interno no servidor.");
+                return StatusCode(500,
+                    new ResponseDto
+                    {
+                        Errors = ["Erro interno no servidor."]
+                    }
+                );
             }
 
         }
@@ -66,14 +82,25 @@ namespace helpDesk.Controllers
 
                 return Ok(response);
             }
+
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(
+                    new ResponseDto
+                    {
+                        Errors = [ex.Message]
+                    }
+                );
             }
 
             catch (Exception)
             {
-                return StatusCode(500, "Erro interno no servidor.");
+                return StatusCode(500,
+                    new ResponseDto
+                    {
+                        Errors = ["Erro interno no servidor."]
+                    }
+                );
             }
 
         }
@@ -92,14 +119,25 @@ namespace helpDesk.Controllers
 
                 return Ok(response);
             }
+
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(
+                    new ResponseDto
+                    {
+                        Errors = [ex.Message]
+                    }
+                );
             }
 
             catch (Exception)
             {
-                return StatusCode(500, "Erro interno no servidor.");
+                return StatusCode(500,
+                    new ResponseDto
+                    {
+                        Errors = ["Erro interno no servidor."]
+                    }
+                );
             }
 
         }
@@ -118,14 +156,24 @@ namespace helpDesk.Controllers
 
                 return Ok(response);
             }
+
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(
+                    new ResponseDto
+                    {
+                        Errors = [ex.Message]
+                    }
+                );
             }
-
             catch (Exception)
             {
-                return StatusCode(500, "Erro interno no servidor.");
+                return StatusCode(500,
+                    new ResponseDto
+                    {
+                        Errors = ["Erro interno no servidor."]
+                    }
+                );
             }
 
         }

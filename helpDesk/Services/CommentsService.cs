@@ -21,9 +21,20 @@ namespace helpDesk.Services
             _ticketRepository = ticketRepository;
         }
 
-        public List<Comment> GetAll()
+        public List<CommentDto> GetAll()
         {
-            return _repository.GetAll();
+            var comments = _repository.GetAll();
+
+            var result = comments.Select(comment => new CommentDto
+            {
+                Id = comment.Id,
+                Content = comment.Content,
+                CreatedAt = comment.CreatedAt,
+                TicketId = comment.TicketId,
+                UserId = comment.UserId
+            }).ToList();
+
+            return result;
         }
 
         public CommentDto GetById(int id)

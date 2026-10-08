@@ -1,29 +1,45 @@
-using helpDesk.Data;
 using helpDesk.Dtos;
 using helpDesk.Exceptions;
 using helpDesk.Models;
+using helpDesk.Repositories;
 
 namespace helpDesk.Services
 {
     public class TicketsServices
     {
-        private readonly AppDbContext _context;
-        public TicketsServices(AppDbContext context)
+        private readonly ITicketRepository _repository;
+        private readonly IUserRepository _userRepository;
+
+        public TicketsServices(ITicketRepository repository, IUserRepository userRepository)
         {
-            _context = context;
+            _repository = repository;
+            _userRepository = userRepository;
         }
 
 
-        public List<Ticket> GetAll()
+        public List<TicketDto> GetAll()
         {
-            var result = _context.Tickets.ToList();
+            var tickets = _repository.GetAll();
+
+            var result = tickets.Select(ticket => new TicketDto
+            {
+                Id = ticket.Id,
+                Title = ticket.Title,
+                Description = ticket.Description,
+                Status = ticket.Status,
+                Priority = ticket.Priority,
+                CreatedAt = ticket.CreatedAt,
+                ClosedAt = ticket.ClosedAt,
+                CustomerId = ticket.CustomerId,
+                AssignedUserId = ticket.AssignedUserId
+            }).ToList();
 
             return result;
         }
 
         public TicketDto GetById(int id)
         {
-            var ticket = _context.Tickets.FirstOrDefault(x => x.Id == id);
+            var ticket = _repository.GetById(id);
 
             if (ticket == null)
             {
@@ -48,7 +64,7 @@ namespace helpDesk.Services
 
         public TicketDto Create(CreateTicketDto dto)
         {
-            var user = _context.Users.FirstOrDefault(x => x.Id == dto.CustomerId);
+            var user = _userRepository.GetById(dto.CustomerId);
             if (user == null)
             {
                 throw new NotFoundException("Id do usuário não encontrado.");
@@ -63,21 +79,19 @@ namespace helpDesk.Services
                 CustomerId = dto.CustomerId
             };
 
-            _context.Tickets.Add(ticket);
-
-            _context.SaveChanges();
+            var createdTicket = _repository.Create(ticket);
 
             var result = new TicketDto
             {
-                Id = ticket.Id,
-                Title = ticket.Title,
-                Description = ticket.Description,
-                Status = ticket.Status,
-                Priority = ticket.Priority,
-                CreatedAt = ticket.CreatedAt,
-                ClosedAt = ticket.ClosedAt,
-                CustomerId = ticket.CustomerId,
-                AssignedUserId = ticket.AssignedUserId
+                Id = createdTicket.Id,
+                Title = createdTicket.Title,
+                Description = createdTicket.Description,
+                Status = createdTicket.Status,
+                Priority = createdTicket.Priority,
+                CreatedAt = createdTicket.CreatedAt,
+                ClosedAt = createdTicket.ClosedAt,
+                CustomerId = createdTicket.CustomerId,
+                AssignedUserId = createdTicket.AssignedUserId
             };
 
             return result;
@@ -85,18 +99,19 @@ namespace helpDesk.Services
 
         public TicketDto Update(int id, UpdateTicketDto dto)
         {
-            var ticket = _context.Tickets.FirstOrDefault(x => x.Id == id);
+            var ticketUpdate = new Ticket
+            {
+                Title = dto.Title,
+                Description = dto.Description,
+                Status = dto.Status,
+                Priority = dto.Priority
+            };
+
+            var ticket = _repository.Update(id, ticketUpdate);
             if (ticket == null)
             {
                 throw new NotFoundException("Id do chamado não encontrado.");
             }
-
-            ticket.Title = dto.Title;
-            ticket.Description = dto.Description;
-            ticket.Status = dto.Status;
-            ticket.Priority = dto.Priority;
-
-            _context.SaveChanges();
 
             var result = new TicketDto
             {
@@ -116,15 +131,11 @@ namespace helpDesk.Services
 
         public TicketDto Delete(int id)
         {
-            var ticket = _context.Tickets.FirstOrDefault(x => x.Id == id);
+            var ticket = _repository.Delete(id);
             if (ticket == null)
             {
                 throw new NotFoundException("Id do chamado não encontrado.");
             }
-
-            _context.Tickets.Remove(ticket);
-
-            _context.SaveChanges();
 
             var result = new TicketDto
             {
