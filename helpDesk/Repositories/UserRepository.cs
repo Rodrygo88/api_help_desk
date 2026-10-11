@@ -39,7 +39,12 @@ namespace helpDesk.Repositories
 
             user.Name = userUpdate.Name;
             user.Email = userUpdate.Email;
-            user.PasswordHash = userUpdate.PasswordHash;
+
+            if (!string.IsNullOrWhiteSpace(userUpdate.PasswordHash))
+            {
+                user.PasswordHash = userUpdate.PasswordHash;
+            }
+
             user.Role = userUpdate.Role;
 
             _context.SaveChanges();
@@ -58,6 +63,11 @@ namespace helpDesk.Repositories
             _context.SaveChanges();
 
             return user;
+        }
+
+        public bool EmailExists(string email)
+        {
+            return _context.Users.Any(x => x.Email == email);
         }
     }
 }

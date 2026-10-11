@@ -6,8 +6,9 @@ namespace helpDesk.Repositories
     {
         List<User> GetAll();
         User? GetById(int id);
-        User? Create(User user);
+        User Create(User user);
         User? Update(int id, User userUpdate);
         User? Delete(int id);
+        bool EmailExists(string email);
     }
 }

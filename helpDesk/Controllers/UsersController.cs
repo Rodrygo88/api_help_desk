@@ -1,12 +1,13 @@
 using helpDesk.Dtos;
-using helpDesk.Exceptions;
 using helpDesk.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace helpDesk.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "Admin")]
     public class UsersController : ControllerBase
     {
         private readonly UsersServices _services;
@@ -20,151 +21,55 @@ namespace helpDesk.Controllers
         {
             var users = _services.GetAll();
 
-            var response = new ResponseDto<List<UserDto>>
-                {
-                    Data = users
-                };
-
-            return Ok(response);
+            return Ok(new ResponseDto<List<UserDto>>
+            {
+                Data = users
+            });
         }
 
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            try
+            var user = _services.GetById(id);
+
+            return Ok(new ResponseDto<UserDto>
             {
-                var user = _services.GetById(id);
-
-                var response = new ResponseDto<UserDto>
-                {
-                    Data = user
-                };
-
-                return Ok(response);
-            }
-
-            catch (NotFoundException ex)
-            {
-                return NotFound(
-                    new ResponseDto
-                    {
-                        Errors = [ex.Message]
-                    }
-                );
-            }
-
-            catch (Exception)
-            {
-                return StatusCode(500,
-                    new ResponseDto
-                    {
-                        Errors = ["Erro interno no servidor."]
-                    }
-                );
-            }
-
+                Data = user
+            });
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public IActionResult Create(CreateUserDto dto)
         {
-            try
+            var user = _services.Create(dto);
+
+            return StatusCode(201, new ResponseDto<UserDto>
             {
-                var user = _services.Create(dto);
-
-                var response = new ResponseDto<UserDto>
-                {
-                    Data = user
-                };
-
-                return Ok(response);
-            }
-
-            catch (Exception)
-            {
-                return StatusCode(500,
-                    new ResponseDto
-                    {
-                        Errors = ["Erro interno no servidor."]
-                    }
-                );
-            }
-
+                Data = user
+            });
         }
 
         [HttpPut("{id}")]
         public IActionResult Update(int id, UpdateUserDto dto)
         {
-            try
+            var user = _services.Update(id, dto);
+
+            return Ok(new ResponseDto<UserDto>
             {
-                var user = _services.Update(id, dto);
-
-                var response = new ResponseDto<UserDto>
-                {
-                    Data = user
-                };
-
-                return Ok(response);
-            }
-
-            catch (NotFoundException ex)
-            {
-                return NotFound(
-                    new ResponseDto
-                    {
-                        Errors = [ex.Message]
-                    }
-                );
-            }
-
-            catch (Exception)
-            {
-                return StatusCode(500,
-                    new ResponseDto
-                    {
-                        Errors = ["Erro interno no servidor."]
-                    }
-                );
-            }
-
+                Data = user
+            });
         }
 
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            try
+            var user = _services.Delete(id);
+
+            return Ok(new ResponseDto<UserDto>
             {
-                var user = _services.Delete(id);
-
-                var response = new ResponseDto<UserDto>
-                {
-                    Data = user
-                };
-
-                return Ok(response);
-            }
-
-            catch (NotFoundException ex)
-            {
-                return NotFound(
-                    new ResponseDto
-                    {
-                        Errors = [ex.Message]
-                    }
-                );
-            }
-
-            catch (Exception)
-            {
-                return StatusCode(500,
-                    new ResponseDto
-                    {
-                        Errors = ["Erro interno no servidor."]
-                    }
-                );
-            }
-
-
+                Data = user
+            });
         }
     }
 }

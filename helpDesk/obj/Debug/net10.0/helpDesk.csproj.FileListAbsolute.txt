@@ -145,3 +145,13 @@ D:\Arquivos\Dev\C#\helpDeskApi\helpDesk\obj\Debug\net10.0\refint\helpDesk.dll
 D:\Arquivos\Dev\C#\helpDeskApi\helpDesk\obj\Debug\net10.0\helpDesk.pdb
 D:\Arquivos\Dev\C#\helpDeskApi\helpDesk\obj\Debug\net10.0\helpDesk.genruntimeconfig.cache
 D:\Arquivos\Dev\C#\helpDeskApi\helpDesk\obj\Debug\net10.0\ref\helpDesk.dll
+D:\Arquivos\Dev\C#\helpDeskApi\helpDesk\bin\Debug\net10.0\BCrypt-Net-Next.dll
+D:\Arquivos\Dev\C#\helpDeskApi\helpDesk\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+D:\Arquivos\Dev\C#\helpDeskApi\helpDesk\bin\Debug\net10.0\Microsoft.Bcl.Cryptography.dll
+D:\Arquivos\Dev\C#\helpDeskApi\helpDesk\bin\Debug\net10.0\Microsoft.IdentityModel.Abstractions.dll
+D:\Arquivos\Dev\C#\helpDeskApi\helpDesk\bin\Debug\net10.0\Microsoft.IdentityModel.JsonWebTokens.dll
+D:\Arquivos\Dev\C#\helpDeskApi\helpDesk\bin\Debug\net10.0\Microsoft.IdentityModel.Logging.dll
+D:\Arquivos\Dev\C#\helpDeskApi\helpDesk\bin\Debug\net10.0\Microsoft.IdentityModel.Protocols.dll
+D:\Arquivos\Dev\C#\helpDeskApi\helpDesk\bin\Debug\net10.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+D:\Arquivos\Dev\C#\helpDeskApi\helpDesk\bin\Debug\net10.0\Microsoft.IdentityModel.Tokens.dll
+D:\Arquivos\Dev\C#\helpDeskApi\helpDesk\bin\Debug\net10.0\System.IdentityModel.Tokens.Jwt.dll

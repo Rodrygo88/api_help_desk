@@ -1,16 +1,17 @@
 using helpDesk.Dtos;
-using helpDesk.Exceptions;
 using helpDesk.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace helpDesk.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class CommentsController : ControllerBase
     {
-
         private readonly CommentsServices _services;
+
         public CommentsController(CommentsServices services)
         {
             _services = services;
@@ -22,159 +23,63 @@ namespace helpDesk.Controllers
             var comments = _services.GetAll();
 
             var response = new ResponseDto<List<CommentDto>>
-                {
-                    Data = comments
-                };
+            {
+                Data = comments
+            };
 
             return Ok(response);
         }
 
-
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            try
+            var comment = _services.GetById(id);
+
+            var response = new ResponseDto<CommentDto>
             {
-                var comment = _services.GetById(id);
+                Data = comment
+            };
 
-                var response = new ResponseDto<CommentDto>
-                {
-                    Data = comment
-                };
-
-                return Ok(response);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(
-                    new ResponseDto
-                    {
-                        Errors = [ex.Message]
-                    }
-                );
-            }
-
-            catch (Exception)
-            {
-                return StatusCode(500,
-                    new ResponseDto
-                    {
-                        Errors = ["Erro interno no servidor."]
-                    }
-                );
-            }
-
+            return Ok(response);
         }
-
 
         [HttpPost]
         public IActionResult Create(CreateCommentDto dto)
         {
-            try
+            var comment = _services.Create(dto);
+
+            var response = new ResponseDto<CommentDto>
             {
-                var comment = _services.Create(dto);
+                Data = comment
+            };
 
-                var response = new ResponseDto<CommentDto>
-                {
-                    Data = comment
-                };
-
-                return Ok(response);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(
-                    new ResponseDto
-                    {
-                        Errors = [ex.Message]
-                    }
-                );
-            }
-
-            catch (Exception)
-            {
-                return StatusCode(500,
-                    new ResponseDto
-                    {
-                        Errors = ["Erro interno no servidor."]
-                    }
-                );
-            }
-
+            return StatusCode(201, response);
         }
 
         [HttpPut("{id}")]
         public IActionResult Update(int id, UpdateCommentDto dto)
         {
-            try
+            var comment = _services.Update(id, dto);
+
+            var response = new ResponseDto<CommentDto>
             {
-                var comment = _services.Update(id, dto);
+                Data = comment
+            };
 
-                var response = new ResponseDto<CommentDto>
-                {
-                    Data = comment
-                };
-
-                return Ok(response);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(
-                    new ResponseDto
-                    {
-                        Errors = [ex.Message]
-                    }
-                );
-            }
-
-            catch (Exception)
-            {
-                return StatusCode(500,
-                    new ResponseDto
-                    {
-                        Errors = ["Erro interno no servidor."]
-                    }
-                );
-            }
-
+            return Ok(response);
         }
 
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            try
+            var comment = _services.Delete(id);
+
+            var response = new ResponseDto<CommentDto>
             {
-                var comment = _services.Delete(id);
+                Data = comment
+            };
 
-                var response = new ResponseDto<CommentDto>
-                {
-                    Data = comment
-                };
-
-                return Ok(response);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(
-                    new ResponseDto
-                    {
-                        Errors = [ex.Message]
-                    }
-                );
-            }
-
-            catch (Exception)
-            {
-                return StatusCode(500,
-                    new ResponseDto
-                    {
-                        Errors = ["Erro interno no servidor."]
-                    }
-                );
-            }
-
-
-
+            return Ok(response);
         }
     }
 }

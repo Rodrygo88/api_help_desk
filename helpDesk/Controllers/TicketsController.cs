@@ -1,15 +1,17 @@
 using helpDesk.Dtos;
-using helpDesk.Exceptions;
 using helpDesk.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace helpDesk.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class TicketsController : ControllerBase
     {
         private readonly TicketsServices _services;
+
         public TicketsController(TicketsServices services)
         {
             _services = services;
@@ -21,161 +23,64 @@ namespace helpDesk.Controllers
             var tickets = _services.GetAll();
 
             var response = new ResponseDto<List<TicketDto>>
-                {
-                    Data = tickets
-                };
+            {
+                Data = tickets
+            };
 
             return Ok(response);
         }
 
-
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            try
+            var ticket = _services.GetById(id);
+
+            var response = new ResponseDto<TicketDto>
             {
-                var ticket = _services.GetById(id);
+                Data = ticket
+            };
 
-                var response = new ResponseDto<TicketDto>
-                {
-                    Data = ticket
-                };
-
-                return Ok(response);
-            }
-
-
-            catch (NotFoundException ex)
-            {
-                return NotFound(
-                    new ResponseDto
-                    {
-                        Errors = [ex.Message]
-                    }
-                );
-            }
-
-            catch (Exception)
-            {
-                return StatusCode(500,
-                    new ResponseDto
-                    {
-                        Errors = ["Erro interno no servidor."]
-                    }
-                );
-            }
-
+            return Ok(response);
         }
 
-
         [HttpPost]
+        [Authorize(Roles = "Customer,Admin")]
         public IActionResult Create(CreateTicketDto dto)
         {
-            try
+            var ticket = _services.Create(dto);
+
+            var response = new ResponseDto<TicketDto>
             {
-                var ticket = _services.Create(dto);
+                Data = ticket
+            };
 
-                var response = new ResponseDto<TicketDto>
-                {
-                    Data = ticket
-                };
-
-                return Ok(response);
-            }
-
-            catch (NotFoundException ex)
-            {
-                return NotFound(
-                    new ResponseDto
-                    {
-                        Errors = [ex.Message]
-                    }
-                );
-            }
-
-            catch (Exception)
-            {
-                return StatusCode(500,
-                    new ResponseDto
-                    {
-                        Errors = ["Erro interno no servidor."]
-                    }
-                );
-            }
-
+            return StatusCode(201, response);
         }
 
         [HttpPut("{id}")]
         public IActionResult Update(int id, UpdateTicketDto dto)
         {
-            try
+            var ticket = _services.Update(id, dto);
+
+            var response = new ResponseDto<TicketDto>
             {
-                var ticket = _services.Update(id, dto);
+                Data = ticket
+            };
 
-                var response = new ResponseDto<TicketDto>
-                {
-                    Data = ticket
-                };
-
-                return Ok(response);
-            }
-
-            catch (NotFoundException ex)
-            {
-                return NotFound(
-                    new ResponseDto
-                    {
-                        Errors = [ex.Message]
-                    }
-                );
-            }
-
-            catch (Exception)
-            {
-                return StatusCode(500,
-                    new ResponseDto
-                    {
-                        Errors = ["Erro interno no servidor."]
-                    }
-                );
-            }
-
+            return Ok(response);
         }
 
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            try
+            var ticket = _services.Delete(id);
+
+            var response = new ResponseDto<TicketDto>
             {
-                var ticket = _services.Delete(id);
+                Data = ticket
+            };
 
-                var response = new ResponseDto<TicketDto>
-                {
-                    Data = ticket
-                };
-
-                return Ok(response);
-            }
-
-            catch (NotFoundException ex)
-            {
-                return NotFound(
-                    new ResponseDto
-                    {
-                        Errors = [ex.Message]
-                    }
-                );
-            }
-            catch (Exception)
-            {
-                return StatusCode(500,
-                    new ResponseDto
-                    {
-                        Errors = ["Erro interno no servidor."]
-                    }
-                );
-            }
-
+            return Ok(response);
         }
     }
 }

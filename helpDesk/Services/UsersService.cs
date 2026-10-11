@@ -53,7 +53,12 @@ namespace helpDesk.Services
 
         public UserDto Create(CreateUserDto dto)
         {
-            var PasswordHash = dto.Password; //aplicar o hash dps
+            var PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
+
+            if (_repository.EmailExists(dto.Email))
+            {
+                throw new EmailExistsException("Email já possui usuário cadastrado.");
+            }
 
             var user = new User
             {
@@ -79,15 +84,23 @@ namespace helpDesk.Services
 
         public UserDto Update(int id, UpdateUserDto dto)
         {
-            var PasswordHash = dto.Password; //aplicar o hash dps
-
+            if (_repository.EmailExists(dto.Email))
+            {
+                throw new EmailExistsException("Email já possui usuário cadastrado.");
+            }
+            
             var userUpdate = new User
             {
                 Name = dto.Name,
                 Email = dto.Email,
-                PasswordHash = PasswordHash,
                 Role = dto.Role
             };
+
+            if (!string.IsNullOrWhiteSpace(dto.Password))
+            {
+                userUpdate.PasswordHash =
+                    BCrypt.Net.BCrypt.HashPassword(dto.Password);
+            }
 
             var user = _repository.Update(id, userUpdate);
 
