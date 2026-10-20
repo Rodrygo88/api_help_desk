@@ -1,0 +1,5 @@
+**/bin/
+**/obj/
+**/helpdesk.db
+**/helpdesk.db-*
+.vs/
