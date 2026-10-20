@@ -1,61 +1,41 @@
-## Status
+# Help Desk API
 
-Em desenvolvimento.
+API REST desenvolvida em **C# e ASP.NET Core** para gerenciamento de usuários, chamados de suporte e comentários. O projeto tem como objetivo praticar desenvolvimento backend, arquitetura em camadas, autenticação e boas práticas do ecossistema .NET.
 
-O projeto continuará sendo evoluído conforme novos conceitos e funcionalidades forem estudados e implementados.
-
-
-# HelpDesk API
-
-API REST de um sistema de Help Desk desenvolvida em **C# e ASP.NET Core**.
-
-O projeto está sendo desenvolvido como forma de prática em desenvolvimento backend, com foco em organização de código, separação de responsabilidades, persistência de dados e aplicação de padrões de arquitetura utilizados no ecossistema .NET.
+**Status:** Em desenvolvimento.
 
 ## Tecnologias
 
-* C#
-* .NET
-* ASP.NET Core
-* Entity Framework Core
-* PostgreSQL (Inicialmente com SQLite)
-* REST API
+- C# e .NET 10
+- ASP.NET Core Web API
+- Entity Framework Core 10
+- SQLite
+- JWT Bearer para autenticação e autorização
+- BCrypt.Net para hash e verificação de senhas
+- Data Annotations para validação de DTOs
 
-## Arquitetura e conceitos
+## Arquitetura
 
-O projeto utiliza uma arquitetura em camadas, separando as responsabilidades entre Controllers, Services, Repositories e a camada de acesso aos dados.
+O projeto utiliza arquitetura em camadas, com separação de responsabilidades entre controllers, services, repositories e acesso aos dados.
 
 ```text
-Controller
+Controllers
     ↓
-Service
+Services
     ↓
-Interface do Repository
+Repository Interfaces
     ↓
-Repository
+Repositories
     ↓
-DbContext
+AppDbContext
     ↓
-Banco de Dados
+SQLite
 ```
 
-Durante o desenvolvimento, estão sendo aplicados conceitos como:
-
-* Injeção de Dependência
-* Interfaces
-* Repository Pattern
-* Entity Framework Core
-* DTOs (Data Transfer Objects)
-* Exceptions personalizadas
-* Operações CRUD
-* Relacionamentos entre entidades
-* Separação de responsabilidades
-* Desenvolvimento de APIs REST
-
-## Estrutura do projeto
+### Estrutura do projeto
 
 ```text
 helpDesk/
-│
 ├── Controllers/
 ├── Data/
 ├── Dtos/
@@ -66,98 +46,144 @@ helpDesk/
 └── Program.cs
 ```
 
-### Controllers
+- **Controllers:** recebem requisições HTTP e retornam respostas.
+- **Services:** implementam regras de negócio e coordenam operações entre repositories.
+- **Repositories:** abstraem o acesso aos dados utilizando Entity Framework Core.
+- **DTOs:** definem os dados recebidos e enviados pela API.
+- **Models:** representam as entidades e seus relacionamentos.
+- **Exceptions:** tratam erros específicos da aplicação.
+- **Data:** contém o `AppDbContext`, responsável pelo acesso ao banco de dados.
 
-Responsáveis por receber as requisições HTTP e retornar as respostas da API.
+## Conceitos aplicados
 
-### Services
+- Injeção de Dependência e interfaces
+- Repository Pattern
+- Separação de responsabilidades
+- Operações CRUD
+- Relacionamentos entre entidades
+- DTOs e validação de dados
+- Autenticação e autorização com JWT
+- Hash de senhas com BCrypt
+- Entity Framework Core e migrations
+- Desenvolvimento de APIs REST
 
-Responsáveis pela lógica da aplicação e pelas regras de negócio. Também coordenam operações que envolvem diferentes repositories.
+## Requisitos
 
-### Repositories
+- .NET 10 SDK
+- Ferramenta `dotnet-ef` compatível com EF Core 10
 
-Responsáveis pelo acesso aos dados e pela comunicação com o banco de dados através do Entity Framework Core.
+## Configuração e execução
 
-Os repositories são acessados através de interfaces, permitindo que a camada de Service dependa de abstrações em vez de implementações concretas.
+A chave de assinatura JWT deve ser definida pela variável de ambiente `HELPDESK_JWT_KEY`. Utilize uma chave aleatória de pelo menos 32 bytes e não armazene segredos reais no código ou no repositório.
 
-### DTOs
+O banco de dados utiliza o arquivo `helpDesk/helpdesk.db`, ignorado pelo Git.
 
-Utilizados para definir os dados recebidos e enviados pela API, evitando a necessidade de expor diretamente as entidades da aplicação.
+**Atenção:** a migration `ClearExistingData` apaga os usuários, chamados e comentários existentes quando aplicada. A reversão da migration não recupera esses dados.
 
-### Models
+## Autenticação
 
-Representam as entidades utilizadas pela aplicação e seus relacionamentos.
+O login é realizado por `POST /api/accounts/login`. Após a autenticação, a API retorna um token JWT válido por **8 horas**.
 
-### Exceptions
-
-Contém exceptions personalizadas utilizadas para representar erros específicos da aplicação, como recursos não encontrados.
-
-### Data
-
-Contém o `AppDbContext`, responsável pelo gerenciamento da comunicação entre a aplicação e o banco de dados através do Entity Framework Core.
-
-## Injeção de Dependência
-
-Os repositories e services são registrados utilizando o sistema de Injeção de Dependência nativo do ASP.NET Core.
-
-Exemplo:
-
-```csharp
-builder.Services.AddScoped<ICommentRepository, CommentRepository>();
-```
-
-Dessa forma, os services podem depender das interfaces dos repositories em vez de depender diretamente de suas implementações.
-
-## Fluxo de uma requisição
-
-Por exemplo, uma requisição para criação de um comentário segue aproximadamente o seguinte fluxo:
+Nas rotas protegidas, envie o token no cabeçalho:
 
 ```text
-Requisição HTTP
-       ↓
-CommentsController
-       ↓
-CommentsServices
-       ↓
-ICommentRepository
-       ↓
-CommentRepository
-       ↓
-AppDbContext
-       ↓
-PostgreSQL
+Authorization: Bearer <token>
 ```
 
-Durante a criação de um comentário, o `CommentsServices` também pode utilizar outros repositories para validar entidades relacionadas:
+O token contém o ID, o nome e o perfil do usuário.
 
-```text
-CommentsServices
-    ├── ICommentRepository
-    ├── IUserRepository
-    └── ITicketRepository
+| Valor JSON | Perfil |
+|---|---|
+| `0` | Customer |
+| `1` | Admin |
+| `2` | Agent |
+
+## Rotas da API
+
+| Método | Rota | Acesso | Descrição |
+|---|---|---|---|
+| POST | `/api/accounts/login` | Público | Autentica e retorna um JWT |
+| POST | `/api/users` | Público | Cadastra usuário |
+| GET | `/api/users` | Admin | Lista usuários |
+| GET | `/api/users/{id}` | Admin | Busca usuário |
+| PUT | `/api/users/{id}` | Admin | Atualiza usuário |
+| DELETE | `/api/users/{id}` | Admin | Exclui usuário |
+| GET | `/api/tickets` | Autenticado | Lista chamados |
+| GET | `/api/tickets/{id}` | Autenticado | Busca chamado |
+| POST | `/api/tickets` | Customer ou Admin | Cria chamado |
+| PUT | `/api/tickets/{id}` | Autenticado | Atualiza chamado |
+| DELETE | `/api/tickets/{id}` | Autenticado | Exclui chamado |
+| POST | `/api/tickets/{id}/accept` | Agent ou Admin | Aceita e assume chamado aberto |
+| POST | `/api/tickets/{id}/close` | Agent ou Admin | Fecha chamado em andamento |
+| GET | `/api/comments` | Autenticado | Lista comentários |
+| GET | `/api/comments/{id}` | Autenticado | Busca comentário |
+| POST | `/api/comments` | Autenticado | Cria comentário |
+| PUT | `/api/comments/{id}` | Autenticado | Atualiza comentário |
+| DELETE | `/api/comments/{id}` | Autenticado | Exclui comentário |
+
+As rotas de usuários, chamados e comentários retornam respostas no formato `{ "data": ..., "errors": [] }`, exceto quando não há corpo de resposta. O login retorna somente o token.
+
+## Valores dos chamados
+
+Os enums são enviados como números no JSON padrão do ASP.NET Core.
+
+**Status:**
+
+- `0` — Open
+- `1` — InProgress
+- `2` — Closed
+
+**Prioridade:**
+
+- `0` — Low
+- `1` — Medium
+- `2` — High
+- `3` — Critical
+
+## Exemplos de requisições
+
+**Cadastro de usuário — `POST /api/users`**
+
+```json
+{
+  "name": "Maria Silva",
+  "email": "maria@example.com",
+  "password": "senha-com-8-caracteres",
+  "role": 0
+}
 ```
 
-Dessa forma, o service pode verificar, por exemplo, se o usuário e o chamado associados ao comentário existem antes de realizar a criação.
+**Login — `POST /api/accounts/login`**
 
-## Funcionalidades atuais
+```json
+{
+  "email": "maria@example.com",
+  "password": "senha-com-8-caracteres"
+}
+```
 
-* Gerenciamento de usuários
-* Gerenciamento de chamados
-* Gerenciamento de comentários
-* Operações CRUD
-* Relacionamento entre entidades
-* Utilização de DTOs
-* Exceptions personalizadas
-* Repository Pattern
-* Injeção de Dependência
-* Persistência de dados com Entity Framework Core
+**Criação de chamado — `POST /api/tickets`**
 
-## Objetivo do projeto
+```json
+{
+  "title": "Não consigo acessar o sistema",
+  "description": "O login retorna uma mensagem de erro.",
+  "status": 0,
+  "priority": 1,
+  "customerId": 1
+}
+```
 
-O projeto tem como objetivo consolidar conhecimentos em desenvolvimento backend com **C# e .NET**, aplicando na prática conceitos de APIs REST, Entity Framework Core, arquitetura em camadas, padrões de projeto e boas práticas de desenvolvimento.
+**Criação de comentário — `POST /api/comments`**
 
-## Status
+```json
+{
+  "content": "Estou analisando o problema.",
+  "userId": 2,
+  "ticketId": 1
+}
+```
 
-Em desenvolvimento.
+## Objetivo
 
-O projeto continuará sendo evoluído conforme novos conceitos e funcionalidades forem estudados e implementados.
+Consolidar conhecimentos em desenvolvimento backend com C# e .NET, evoluindo gradualmente a aplicação por meio da implementação de novas funcionalidades, padrões de projeto e boas práticas de desenvolvimento.
