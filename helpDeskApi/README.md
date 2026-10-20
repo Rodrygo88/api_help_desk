@@ -21,18 +21,6 @@ API REST para gerenciamento de usuarios, chamados de suporte e comentarios.
 
 A chave de assinatura JWT deve ser fornecida pela variavel de ambiente `HELPDESK_JWT_KEY`. Gere uma chave aleatoria de 32 bytes ou mais; nao coloque uma chave real no codigo ou no repositorio.
 
-No PowerShell, na raiz do repositorio:
-
-```powershell
-$bytes = New-Object byte[] 32
-$rng = [Security.Cryptography.RandomNumberGenerator]::Create()
-$rng.GetBytes($bytes)
-$env:HELPDESK_JWT_KEY = [Convert]::ToBase64String($bytes)
-$rng.Dispose()
-dotnet ef database update --project helpDesk
-dotnet run --project helpDesk
-```
-
 A API usa o arquivo SQLite `helpDesk/helpdesk.db`. Esse arquivo e ignorado pelo Git. A migration `ClearExistingData` apaga usuarios, chamados e comentarios existentes quando aplicada; ela nao consegue restaurar esses dados ao ser revertida.
 
 ## Autenticacao
